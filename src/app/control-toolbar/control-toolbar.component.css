@@ -1,0 +1,30 @@
+:host {
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+
+.app-control-toolbar {
+    display: flex;
+    height: 100%;
+}
+
+.container-box {
+    height: 100%;
+    margin: 1px;
+}
+
+.left-container {
+    display: flex;
+    padding: 2px;
+}
+
+
+
+.middle-container {
+    flex: 1;
+}
+
+.right-container {
+    flex: 1;
+}

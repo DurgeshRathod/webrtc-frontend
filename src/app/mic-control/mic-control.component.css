@@ -1,0 +1,11 @@
+:host{
+    flex: 1;
+}
+
+.app-mic-control{
+    padding: 12px;
+    cursor: pointer;
+}
+.mic-img {
+    height: 45px;
+}
