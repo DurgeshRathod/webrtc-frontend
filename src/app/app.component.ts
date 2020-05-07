@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SocketioService } from './socketio.service';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +8,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppComponent implements OnInit{
   title = 'webrtc-frontend';
-  ngOnInit(){
-    // navigator.mediaDevices.getUserMedia({audio:true,video:true})
+  constructor(private socketService: SocketioService) {}
+  ngOnInit() {
+    this.socketService.setupSocketConnection();
   }
 }

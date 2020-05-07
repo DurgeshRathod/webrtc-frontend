@@ -9,11 +9,26 @@ export class MicControlComponent implements OnInit {
 
   constructor() { }
 
-  micON = true;
+  micON = false;
   ngOnInit() {
   }
 
-  toggleMic(){
+  stream: any
+  toggleMic() {
     this.micON = !this.micON;
+    if (this.micON) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then((stream: any) => {
+        this.stream = stream
+        console.log(stream)
+      }).catch((err) => {
+        alert(err)
+      })
+    } else {
+      this.stream.getTracks().map(function (val) {
+        if (val.kind == "audio") {
+          val.stop();
+        }
+      });
+    }
   }
 }
