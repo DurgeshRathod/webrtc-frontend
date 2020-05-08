@@ -86,12 +86,12 @@ export class VideoControlComponent implements OnInit {
         }
 
         let CreateVideo = (stream) => {
-          this.CreateDiv()
+          // this.CreateDiv()
 
           let video = document.createElement('video')
           video.id = 'peerVideo'
           video.srcObject = stream
-          video.setAttribute('class', 'embed-responsive-item')
+          // video.setAttribute('class', 'embed-responsive-item')
           document.querySelector('#peerDiv').appendChild(video)
           video.play()
           //wait for 1 sec
@@ -147,10 +147,10 @@ export class VideoControlComponent implements OnInit {
   }
 
   CreateDiv() {
-    let div = document.createElement('div')
-    div.setAttribute('class', "centered")
-    div.id = "muteText"
-    div.innerHTML = "Click to Mute/Unmute"
-    document.querySelector('#peerDiv').appendChild(div)
+    let videoEle = document.createElement('video')
+    videoEle.setAttribute('class', "centered")
+    videoEle.id = "muteText"
+    
+    document.querySelector('#peerDiv').appendChild(videoEle)
   }
 }
