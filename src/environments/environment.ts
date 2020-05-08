@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  SOCKET_ENDPOINT: 'ws://localhost:3000/'
+  SOCKET_ENDPOINT: 'ws://localhost:8999/'
 }
 /*
  * For easier debugging in development mode, you can import the following file

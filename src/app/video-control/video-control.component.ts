@@ -13,29 +13,34 @@ export class VideoControlComponent implements OnInit {
   constructor(private socketService: SocketioService) { }
   currentFilter
   videoON = false;
-  socket
+  socket;
+  room_id = "ROOM-1"
   ngOnInit() {
     this.socket = this.socketService.socket;
-    this.socket.emit("JOIN_ROOM","ROOM-1")
+    this.socket.emit("JOIN_ROOM", this.room_id)
   }
-  client = {}
+  client = {
+    gotAnswer: false,
+    peer: undefined
+  }
   vid: any;
   stream: any
-  toggleVideo() { 
+  toggleVideo() {
     this.videoON = !this.videoON;
     if (this.videoON) {
-      navigator.mediaDevices.getUserMedia({ video: true }).then((stream: any) => {
+      navigator.mediaDevices.getUserMedia({ video: true , audio: true}).then((stream: any) => {
         this.stream = stream
+        this.socket.emit('NewClient')
         this.vid = document.getElementById("vidId");
         this.vid.srcObject = stream;
         this.vid.play();
 
 
-         //used to initialize a peer
-         function InitPeer(type) {
+        //used to initialize a peer
+        function InitPeer(type) {
           let peer = new Peer({ initiator: (type == 'init') ? true : false, stream: stream, trickle: false })
           peer.on('stream', function (stream) {
-              CreateVideo(stream)
+            CreateVideo(stream)
           })
           //This isn't working in chrome; works perfectly in firefox.
           // peer.on('close', function () {
@@ -48,37 +53,39 @@ export class VideoControlComponent implements OnInit {
           //     peervideo.style.filter = decodedData
           // })
           return peer
-      }
+        }
 
-      //for peer of type init
-      function MakePeer() {
+        //for peer of type init
+        let MakePeer = () => {
+          console.log("CreatePeer");
+
           this.client.gotAnswer = false
           let peer = InitPeer('init')
-          peer.on('signal', function (data) {
-              if (!this.client.gotAnswer) {
-                this.socket.emit('Offer', data)
-              }
+          peer.on('signal', (data) => {
+            if (!this.client.gotAnswer) {
+              this.socket.emit('Offer', { room: this.room_id, offer: data });
+            }
           })
           this.client.peer = peer
-      }
+        }
 
-      //for peer of type not init
-      function FrontAnswer(offer) {
+        //for peer of type not init
+        let FrontAnswer = (offer) => {
           let peer = InitPeer('notInit')
           peer.on('signal', (data) => {
-            this.socket.emit('Answer', data)
+            this.socket.emit('Answer', {room:this.room_id, data:data})
           })
           peer.signal(offer)
           this.client.peer = peer
-      }
+        }
 
-      function SignalAnswer(answer) {
+        let SignalAnswer = (answer) => {
           this.client.gotAnswer = true
           let peer = this.client.peer
           peer.signal(answer)
-      }
+        }
 
-      function CreateVideo(stream) {
+        let CreateVideo = (stream) => {
           this.CreateDiv()
 
           let video = document.createElement('video')
@@ -91,35 +98,40 @@ export class VideoControlComponent implements OnInit {
           // setTimeout(() => SendFilter(this.currentFilter), 1000)
 
           video.addEventListener('click', () => {
-              if (video.volume != 0)
-                  video.volume = 0
-              else
-                  video.volume = 1
+            if (video.volume != 0)
+              video.volume = 0
+            else
+              video.volume = 1
           })
 
-      }
-
-      function SessionActive() {
-          document.write('Session Active. Please come back later')
-      }
+        }
 
 
-      function RemovePeer() {
+
+        let RemovePeer = () => {
           document.getElementById("peerVideo").remove();
           document.getElementById("muteText").remove();
           if (this.client.peer) {
-              this.client.peer.destroy()
+            this.client.peer.destroy()
           }
-      }
+        }
 
-      this.socket.on('BackOffer', FrontAnswer)
-      this.socket.on('BackAnswer', SignalAnswer)
-      this.socket.on('SessionActive', SessionActive)
-      this.socket.on('CreatePeer', MakePeer)
-      this.socket.on('Disconnect', RemovePeer)
+        // this.socket.on('BackOffer', FrontAnswer);
+        this.socket.on('BackOffer', (offer) => {
+          console.log("Backoffer")
+          let peer = InitPeer('notInit')
+          peer.on('signal', (data) => {
+            this.socket.emit('Answer', data)
+          })
+          peer.signal(offer)
+          this.client.peer = peer
+        });
+        this.socket.on('BackAnswer', SignalAnswer);
+        this.socket.on('CreatePeer', MakePeer());
+        this.socket.on('Disconnect', RemovePeer);
         console.log(stream)
       }).catch((err) => {
-        alert(err)
+        console.log(err)
       })
     } else {
       this.vid.pause;
