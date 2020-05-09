@@ -137,9 +137,9 @@ export class VideoControlComponent implements OnInit {
       this.vid.pause;
       this.vid.srcObject = null
       // this.stream.stop();
-      this.stream.getTracks().map(function (val) {
-        if (val.kind == "video") {
-          val.stop();
+      this.stream.getTracks().map(function (track) {
+        if (track.kind == "video") {
+          track.stop();
         }
 
       });

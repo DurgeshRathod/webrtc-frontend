@@ -24,9 +24,9 @@ export class MicControlComponent implements OnInit {
         alert(err)
       })
     } else {
-      this.stream.getTracks().map(function (val) {
-        if (val.kind == "audio") {
-          val.stop();
+      this.stream.getTracks().map(function (track) {
+        if (track.kind == "audio") {
+          track.stop();
         }
       });
     }
