@@ -30,7 +30,7 @@ export class VideoControlComponent implements OnInit {
   toggleVideo() {
     this.videoON = !this.videoON;
     if (this.videoON) {
-      navigator.mediaDevices.getUserMedia({ video: true , audio: true}).then((stream: any) => {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream: any) => {
         this.stream = stream
         this.socket.emit('NewClient')
         this.vid = document.getElementById("vidId");
@@ -39,24 +39,21 @@ export class VideoControlComponent implements OnInit {
 
 
         //used to initialize a peer
-        function InitPeer(type) {
+        let InitPeer = (type) => {
           let peer = new Peer({ initiator: (type == 'init') ? true : false, stream: stream, trickle: false })
-          peer.on('stream', function (stream) {
+          peer.on('stream',  (stream) => {
             console.log('peer on stream called');
             console.log(stream);
-            
+
             // CreateVideo(stream)
 
             // this.video = document.createElement('video');
             // this.video.id = 'peerVideo';
-            this.video = document.getElementById("peerVideo");
-            
-            this.video.srcObject = stream;
-            this.video.play();
+            this.playPeerVideo(stream)
             // this.video.setAttribute('class', 'embed-responsive-item');
             // document.querySelector('#peerDiv').appendChild(this.video);
             // this.video.play();
-         
+
           })
           //This isn't working in chrome; works perfectly in firefox.
           // peer.on('close', function () {
@@ -79,7 +76,7 @@ export class VideoControlComponent implements OnInit {
           let peer = InitPeer('init')
           peer.on('signal', (data) => {
             console.log('peer on signal called');
-            
+
             if (!this.client.gotAnswer) {
               this.socket.emit('Offer', { room: this.room_id, offer: data });
             }
@@ -91,7 +88,7 @@ export class VideoControlComponent implements OnInit {
         let FrontAnswer = (offer) => {
           let peer = InitPeer('notInit')
           peer.on('signal', (data) => {
-            this.socket.emit('Answer', {room:this.room_id, data:data})
+            this.socket.emit('Answer', { room: this.room_id, data: data })
           })
           peer.signal(offer)
           this.client.peer = peer
@@ -107,7 +104,7 @@ export class VideoControlComponent implements OnInit {
           let peer = InitPeer('notInit')
           peer.on('signal', (data) => {
             console.log('peer ');
-            
+
             this.socket.emit('Answer', data)
           })
           peer.signal(offer)
@@ -128,13 +125,18 @@ export class VideoControlComponent implements OnInit {
       this.vid.pause;
       this.vid.srcObject = null
       // this.stream.stop();
-      this.stream.getTracks().map(function (track) {
+      this.stream.getTracks().map( (track)=> {
         // if (track.kind == "video") {
-          track.stop();
+        track.stop();
         // }
 
       });
     }
   }
 
+  playPeerVideo(stream) {
+    this.video = document.getElementById("peerVideo");
+    this.video.srcObject = stream;
+    this.video.play();
+  }
 }
