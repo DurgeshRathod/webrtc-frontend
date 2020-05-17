@@ -119,7 +119,7 @@ export class VideoControlComponent implements OnInit {
           peer.signal(answer)
         });
         this.socket.on('CreatePeer', MakePeer());
-        this.socket.on('Disconnect', RemovePeer);
+        // this.socket.on('Disconnect', RemovePeer);
         console.log(stream)
       }).catch((err) => {
         console.log(err)
