@@ -123,7 +123,6 @@ export class VideoControlComponent implements OnInit {
       })
     } else {
       this.vid.pause;
-      this.vid.srcObject = null
       // this.stream.stop();
       this.stream.getTracks().map( (track)=> {
         // if (track.kind == "video") {
@@ -131,6 +130,7 @@ export class VideoControlComponent implements OnInit {
         // }
 
       });
+      this.vid.srcObject = null
     }
   }
 
